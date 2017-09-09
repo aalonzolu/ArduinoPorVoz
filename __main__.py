@@ -29,12 +29,11 @@ def APIAI_rec(texto):
 Running = True
 #audio from mic
 r = sr.Recognizer()
-with sr.Microphone() as source:
-    r.adjust_for_ambient_noise(source)
 while Running:
     print()
-    #r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")
+    respuesta = ""
     with sr.Microphone() as source:
+        r.adjust_for_ambient_noise(source)
         print("Diga algo: ")
         audio = r.listen(source)
     try:
@@ -42,12 +41,11 @@ while Running:
         print("Usted dijo: " + frase)
         res = APIAI_rec(frase)
         arduino.arduAction(res['action'])
-        print(res['message'])
-        tts = gTTS(text=res['message'], lang='es')
-        tts.save("say.mp3")
-        playsound("./say.mp3")
-        print()
+        respuesta = res['message']
     except:
-        print("No se le entiende nada")
+        respuesta = "No se le entiende nada"
+    tts = gTTS(text=res['message'], lang='es')
+    tts.save("say.mp3")
+    playsound("./say.mp3")
     if frase.lower() == "salir":
         Running = False
