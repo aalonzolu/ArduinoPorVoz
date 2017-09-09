@@ -27,32 +27,19 @@ def APIAI_rec(texto):
     return {'action':res['result']['action'],'message':res['result']['fulfillment']['messages'][0]['speech']}
 
 Running = True
-Speach = False
 #audio from mic
 r = sr.Recognizer()
 with sr.Microphone() as source:
     r.adjust_for_ambient_noise(source)
 while Running:
     print()
-    if Speach:
-        #r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")
-        with sr.Microphone() as source:
-            print("Diga algo: ")
-            audio = r.listen(source)
-        try:
-            frase = r.recognize_google(audio)
-            print("Usted dijo: " + frase)
-            res = APIAI_rec(frase)
-            arduino.arduAction(res['action'])
-            print(res['message'])
-            tts = gTTS(text=res['message'], lang='es')
-            tts.save("say.mp3")
-            playsound("./say.mp3")
-            print()
-        except:
-            print("No se le entiende nada")
-    else:
-        frase = input("Diga algo: ")
+    #r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")
+    with sr.Microphone() as source:
+        print("Diga algo: ")
+        audio = r.listen(source)
+    try:
+        frase = r.recognize_google(audio,language="es-GT")
+        print("Usted dijo: " + frase)
         res = APIAI_rec(frase)
         arduino.arduAction(res['action'])
         print(res['message'])
@@ -60,6 +47,7 @@ while Running:
         tts.save("say.mp3")
         playsound("./say.mp3")
         print()
-    inp = input("Preciona una tecla para continuar, S para salir>> ")
-    if inp.lower() == "s":
+    except:
+        print("No se le entiende nada")
+    if frase.lower() == "salir":
         Running = False

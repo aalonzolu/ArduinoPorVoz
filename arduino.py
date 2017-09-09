@@ -4,7 +4,7 @@ def arduAction(action):
 
     LED_PIN = 8
     ALARM_PIN =9
-    BOARD = '/dev/tty.usbserial-A6008rIF'
+    BOARD = '/dev/cu.usbmodem1411'
     try:
         board = Arduino(BOARD)
         if (action == 'luz-on'):
