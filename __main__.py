@@ -32,6 +32,7 @@ r = sr.Recognizer()
 while Running:
     print()
     respuesta = ""
+    action = ""
     with sr.Microphone() as source:
         r.adjust_for_ambient_noise(source)
         print("Diga algo: ")
@@ -40,6 +41,7 @@ while Running:
         frase = r.recognize_google(audio,language="es-GT")
         print("Usted dijo: " + frase)
         res = APIAI_rec(frase)
+        action = res['action']
         arduino.arduAction(res['action'])
         respuesta = res['message']
     except:
@@ -47,5 +49,5 @@ while Running:
     tts = gTTS(text=res['message'], lang='es')
     tts.save("say.mp3")
     playsound("./say.mp3")
-    if frase.lower() == "salir":
+    if action == "exit":
         Running = False
