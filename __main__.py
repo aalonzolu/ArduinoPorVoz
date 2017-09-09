@@ -9,12 +9,8 @@ from playsound import playsound
 
 import arduino
 
-CLIENT_ACCESS_TOKEN = '0be9930a8de146deb3014346c5de1d9d'
+CLIENT_ACCESS_TOKEN = 'API.AI_ACCESS_TOKEN'
 ai = apiai.ApiAI(CLIENT_ACCESS_TOKEN)
-request = ai.text_request()
-request.lang = 'es'  # Lenguaje
-request.session_id = "_HOlaMundo_"
-
 
 def APIAI_rec(texto):
     request = ai.text_request()
@@ -45,7 +41,7 @@ while Running:
         arduino.arduAction(res['action'])
         respuesta = res['message']
     except:
-        respuesta = "No se le entiende nada"
+        respuesta = "No se le entiende ni mais"
     tts = gTTS(text=res['message'], lang='es')
     tts.save("say.mp3")
     playsound("./say.mp3")
