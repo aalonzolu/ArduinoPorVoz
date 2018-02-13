@@ -1,16 +1,32 @@
 #!/usr/bin/env python3
-
-import speech_recognition as sr
-from gtts import gTTS
 import json
+from flask import Flask, request
+from flask_restful import Resource, Api
+from sqlalchemy import create_engine
+from json import dumps
+from flask.ext.jsonpify import jsonify
+
 import apiai
-from playsound import playsound
+import speech_recognition as sr
+from cleverwrap import CleverWrap
+import core as C
 
 
-import arduino
+import modules as M
 
-CLIENT_ACCESS_TOKEN = 'API.AI_ACCESS_TOKEN'
+CLIENT_ACCESS_TOKEN = '0be9930a8de146deb3014346c5de1d9d'
+#Instanciar API.AI
 ai = apiai.ApiAI(CLIENT_ACCESS_TOKEN)
+#Instanciar Cleverbot
+cw = CleverWrap("CC1yyLsWicOuwBwEhMJigtOkixg")
+
+AL = M.Analyzer()
+
+
+app = Flask(__name__)
+api = Api(app)
+
+TOKENS = ['234234123123eddjhskdasa342','1233543jkk4hkjdhsfhsas']
 
 def APIAI_rec(texto):
     request = ai.text_request()
@@ -20,30 +36,31 @@ def APIAI_rec(texto):
     response = request.getresponse()
     res = response.read()
     res = json.loads(res)
-    return {'action':res['result']['action'],'message':res['result']['fulfillment']['messages'][0]['speech']}
-
-Running = True
-#audio from mic
-r = sr.Recognizer()
-while Running:
-    print()
-    respuesta = ""
-    action = ""
-    with sr.Microphone() as source:
-        r.adjust_for_ambient_noise(source)
-        print("Diga algo: ")
-        audio = r.listen(source)
-    try:
-        frase = r.recognize_google(audio,language="es-GT")
-        print("Usted dijo: " + frase)
+    datares = {
+        'action': res['result']['action'],
+        'message': res['result']['fulfillment']['messages'][0]['speech'],
+        'parameters': res['result']['parameters']
+        }
+    return datares
+def CheckToken(token):
+    if token in TOKENS:
+        return True
+    else:
+        return False
+class MyIA(Resource):
+    def get(self, token, frase):
         res = APIAI_rec(frase)
-        action = res['action']
-        arduino.arduAction(res['action'])
-        respuesta = res['message']
-    except:
-        respuesta = "No se le entiende ni mais"
-    tts = gTTS(text=res['message'], lang='es')
-    tts.save("say.mp3")
-    playsound("./say.mp3")
-    if action == "exit":
-        Running = False
+        if (res['action'] == 'input.unknown'):
+            # No hay accion, usar cleverbot
+            res['message'] = cw.say(frase)
+        else:
+            alrs = AL.analize(res)
+            if (alrs):
+                res['message'] = alrs[1]
+        return res
+
+
+api.add_resource(MyIA, '/ia/<token>/<frase>') # Route_1
+
+if __name__ == '__main__':
+     app.run(port=3000)

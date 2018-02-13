@@ -1,6 +1,0 @@
-pyfirmata
-SpeechRecognition
-pyaudio
-apiai
-gTTS
-playsound

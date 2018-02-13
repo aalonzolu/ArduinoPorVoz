@@ -1,0 +1,11 @@
+pyfirmata
+SpeechRecognition
+pyaudio
+apiai
+gTTS
+playsound
+spotipy
+flask
+flask-jsonpify
+flask-sqlalchemy
+flask-restful
